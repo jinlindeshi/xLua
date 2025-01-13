@@ -8,11 +8,27 @@
       "url": "https://packages.tuanjie.cn"
     },
     "com.qq.weixin.minigame": {
-      "version": "https://gitee.com/wechat-minigame/minigame-tuanjie-transform-sdk.git#v0.1.18",
+      "version": "https://gitee.com/wechat-minigame/minigame-tuanjie-transform-sdk.git#main",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "4443e5a9bcf800118f7c3e10a7750e804ed3121b"
+      "hash": "66b5753181c9e3341c206f4447c22b89f6d6c152"
+    },
+    "com.unity.ext.nunit": {
+      "version": "1.0.6",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.ide.rider": {
+      "version": "3.0.34",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ext.nunit": "1.0.6"
+      },
+      "url": "https://packages.tuanjie.cn"
     },
     "com.unity.ugui": {
       "version": "1.0.0",
