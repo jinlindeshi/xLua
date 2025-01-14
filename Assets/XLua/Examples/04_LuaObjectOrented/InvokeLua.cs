@@ -12,6 +12,9 @@ using XLua;
 
 namespace XLuaTest
 {
+// #if UNITY_WEIXINMINIGAME
+//     
+// #endif
     public class PropertyChangedEventArgs : EventArgs
     {
         public string name;
