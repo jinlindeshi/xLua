@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
 import moduleHelper from './module-helper';
 export default {
     handleText(s, f, c) {
@@ -47,6 +46,31 @@ export default {
             callbackId: id,
             errMsg: res.errMsg,
             errCode: res.errCode,
+        }));
+    },
+    handlecloudCallFunction(s, f, c) {
+        const self = this;
+        return {
+            success(res) {
+                self.cloudCallFunctionFormat(s, res);
+            },
+            fail(res) {
+                self.cloudCallFunctionFormat(f, res);
+            },
+            complete(res) {
+                self.cloudCallFunctionFormat(c, res);
+            },
+        };
+    },
+    cloudCallFunctionFormat(id, res) {
+        if (!id) {
+            return false;
+        }
+        moduleHelper.send('CloudCallFunctionResponseCallback', JSON.stringify({
+            callbackId: id,
+            errMsg: res.errMsg,
+            result: typeof res.result === 'object' ? JSON.stringify(res.result) : res.result,
+            requestID: res.requestID,
         }));
     },
     handle(formatFunc, s, f, c) {

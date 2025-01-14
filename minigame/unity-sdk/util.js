@@ -171,7 +171,4 @@ export default {
             args,
         }));
     },
-    WX_SetPreferredFramesPerSecond(fps) {
-        wx.setPreferredFramesPerSecond(fps);
-    },
 };

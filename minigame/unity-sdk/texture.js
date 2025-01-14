@@ -1,7 +1,4 @@
-﻿/* eslint-disable no-param-reassign */
-/* eslint-disable no-restricted-properties */
-/* eslint-disable no-plusplus */
-import canvasContext from './canvas-context';
+﻿import canvasContext from './canvas-context';
 const downloadedTextures = {};
 const downloadingTextures = {};
 const downloadFailedTextures = {};
@@ -254,13 +251,16 @@ canvasContext.addCreatedListener(() => {
     if (GameGlobal.USED_TEXTURE_COMPRESSION) {
         mod.getSupportedExtensions();
         if (GameGlobal.TextureCompressedFormat === '' || GameGlobal.TextureCompressedFormat === 'pvr') {
-            const { platform } = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
-            if (platform === 'ios') {
-                wx.showModal({
-                    title: '提示',
-                    content: '当前操作系统版本过低，建议您升级至最新版本。',
-                });
-            }
+            wx.getSystemInfo({
+                success(res) {
+                    if (res.platform === 'ios') {
+                        wx.showModal({
+                            title: '提示',
+                            content: '当前操作系统版本过低，建议您升级至最新版本。',
+                        });
+                    }
+                },
+            });
         }
     }
     wx.onNetworkStatusChange((res) => {

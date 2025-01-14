@@ -1,5 +1,4 @@
-﻿/* eslint-disable no-underscore-dangle */
-const PreLoadKeys = []; 
+﻿const PreLoadKeys = []; 
 const storage = {
     _cacheData: {},
     _handleList: [],

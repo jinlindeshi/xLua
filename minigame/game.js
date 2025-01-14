@@ -1,5 +1,4 @@
-
-import './plugins/screen-adapter';// @ts-nocheck
+// @ts-nocheck
 import './weapp-adapter';
 import './events';
 import './texture-config';
@@ -9,12 +8,13 @@ import './unity-sdk/index';
 import checkVersion from './check-version';
 import { launchEventType, scaleMode } from './plugin-config';
 import { preloadWxCommonFont } from './unity-sdk/font/index';
+import './plugins/screen-adapter';
 const managerConfig = {
-    DATA_FILE_MD5: '0fa9c61a57ae52dd',
-    CODE_FILE_MD5: '912f55c31bd32ff3',
+    DATA_FILE_MD5: 'de3d593de52bf746',
+    CODE_FILE_MD5: '9b0b54f799bc9ec4',
     GAME_NAME: 'webgl',
     APPID: '',
-    DATA_FILE_SIZE: '4280595',
+    DATA_FILE_SIZE: '4238269',
     OPT_DATA_FILE_SIZE: '$OPT_DATA_FILE_SIZE',
     DATA_CDN: '',
     // 资源包是否作为小游戏分包加载
@@ -28,9 +28,8 @@ const managerConfig = {
         ,
     ],
     contextConfig: {
-        contextType: 2, // 1: webgl1  2: webgl2
+        contextType: 2, // 1=>webgl1  2=>webgl2 3=>auto
     },
-    PROFILER_UPLOAD_URL: '',
 };
 GameGlobal.managerConfig = managerConfig;
 // 版本检查

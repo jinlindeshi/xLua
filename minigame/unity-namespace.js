@@ -1,4 +1,6 @@
 // @ts-nocheck
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 const unityNamespace = {
     canvas: GameGlobal.canvas,
     // cache width
@@ -18,7 +20,7 @@ const unityNamespace = {
     unityVersion: '2022.3.48t3',
     // Color Space: Gamma、Linear、Uninitialized(未初始化的颜色空间)
     unityColorSpace: 'Gamma',
-    convertPluginVersion: '202501100935',
+    convertPluginVersion: '202408200401',
     // 拼在StreamingAssets前面的path，DATA_CDN + streamingUrlPrefixPath + StreamingAssets
     streamingUrlPrefixPath: '',
     // DATA_CDN + dataFileSubPrefix + datafilename
@@ -50,13 +52,7 @@ const unityNamespace = {
     // 是否用了多线程brotli压缩
     useBrotliMT: true,
     // Boot config配置，包含例如wait-for-native-debugger、player-connection-ip等信息
-    bootConfig: 'player-connection-ip=192.168.18.242',
-    // 是否以Development Build构建
-    isDevelopmentBuild: false,
-    // 是否以Profiling Build导出
-    isProfilingBuild: false,
-    // 预留的堆内存
-    unityHeapReservedMemory: 256,
+    bootConfig: 'player-connection-ip=192.168.1.75',
 };
 // 最佳实践检测配置
 unityNamespace.monitorConfig = {
@@ -135,51 +131,62 @@ function bindGloblException() {
         console.error('unhandledRejection:', result.reason);
     });
     // 上报初始信息
-    function printSystemInfo(appBaseInfo, deviceInfo) {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { version, SDKVersion } = appBaseInfo;
-        const { platform, system } = deviceInfo;
+    function printSystemInfo(systemInfo) {
+        GameGlobal.systemInfoCached = systemInfo;
+        const { version, SDKVersion, platform, renderer, system } = systemInfo;
         unityNamespace.version = version;
         unityNamespace.SDKVersion = SDKVersion;
         unityNamespace.platform = platform;
+        unityNamespace.renderer = renderer;
         unityNamespace.system = system;
         unityNamespace.isPc = platform === 'windows' || platform === 'mac';
         unityNamespace.isDevtools = platform === 'devtools';
         unityNamespace.isMobile = !unityNamespace.isPc && !unityNamespace.isDevtools;
-        unityNamespace.isH5Renderer = GameGlobal.isIOSHighPerformanceMode;
+        unityNamespace.isH5Renderer = unityNamespace.isMobile && unityNamespace.renderer === 'h5';
         unityNamespace.isIOS = platform === 'ios';
         unityNamespace.isAndroid = platform === 'android';
         const bootinfo = {
-            renderer: GameGlobal.isIOSHighPerformanceMode ? 'h5' : '',
+            renderer: systemInfo.renderer || '',
             isH5Plus: GameGlobal.isIOSHighPerformanceModePlus || false,
-            abi: deviceInfo.abi || '',
-            brand: deviceInfo.brand,
-            model: deviceInfo.model,
-            platform: deviceInfo.platform,
-            system: deviceInfo.system,
-            version: appBaseInfo.version,
-            SDKVersion: appBaseInfo.SDKVersion,
-            benchmarkLevel: deviceInfo.benchmarkLevel,
+            abi: systemInfo.abi || '',
+            brand: systemInfo.brand,
+            model: systemInfo.model,
+            platform: systemInfo.platform,
+            system: systemInfo.system,
+            version: systemInfo.version,
+            SDKVersion: systemInfo.SDKVersion,
+            benchmarkLevel: systemInfo.benchmarkLevel,
         };
         GameGlobal.realtimeLogManager.info('game starting', bootinfo);
         GameGlobal.logmanager.info('game starting', bootinfo);
         console.info('game starting', bootinfo);
     }
-    const appBaseInfo = wx.getAppBaseInfo ? wx.getAppBaseInfo() : wx.getSystemInfoSync();
-    const deviceInfo = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
-    printSystemInfo(appBaseInfo, deviceInfo);
+    const systemInfoSync = wx.getSystemInfoSync();
+    const isEmptySystemInfo = systemInfoSync && Object.keys(systemInfoSync).length === 0;
+    // iOS会出现getSystemInfoSync返回空对象的情况，使用异步方法替代
+    if (isEmptySystemInfo) {
+        wx.getSystemInfo({
+            success(systemInfo) {
+                printSystemInfo(systemInfo);
+            },
+        });
+    }
+    else {
+        printSystemInfo(systemInfoSync);
+    }
 }
 bindGloblException();
 // eslint-disable-next-line no-multi-assign
 GameGlobal.onCrash = GameGlobal.unityNamespace.onCrash = function () {
     GameGlobal.manager.showAbort();
-    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    // 避免已经修改屏幕尺寸，故不使用缓存的systeminfo
+    const sysInfo = wx.getSystemInfoSync();
     wx.createFeedbackButton({
         type: 'text',
         text: '提交反馈',
         style: {
-            left: (windowInfo.screenWidth - 184) / 2,
-            top: windowInfo.screenHeight / 3 + 140,
+            left: (sysInfo.screenWidth - 184) / 2,
+            top: sysInfo.screenHeight / 3 + 140,
             width: 184,
             height: 40,
             lineHeight: 40,

@@ -1,7 +1,4 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-plusplus */
-import { isAndroid, isPc, webAudioNeedResume, isSupportBufferURL, isSupportPlayBackRate, isSupportInnerAudio, isIOS175, } from '../../check-version';
+import { isAndroid, isPc, webAudioNeedResume, isSupportBufferURL, isSupportPlayBackRate, isSupportInnerAudio, } from '../../check-version';
 import { WEBAudio, unityAudioVolume } from './store';
 import { TEMP_DIR_PATH } from './const';
 import { createInnerAudio, destroyInnerAudio, printErrMsg, resumeWebAudio } from './utils';
@@ -17,7 +14,6 @@ function jsAudioCreateUncompressedSoundClip(buffer, error, length) {
             this.buffer = null;
             WEBAudio.audioBufferLength -= length;
         },
-        resetGain() { },
         getLength() {
             if (!this.buffer) {
                 
@@ -81,11 +77,10 @@ function jsAudioCreateCompressedSoundClip(audioData, ptr, length) {
             }
             delete this.url;
         },
-        resetGain() { },
         getLength() {
             return this.length || 0;
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        
         getData(ptr, length) {
             console.warn('getData() is not supported for compressed sound.');
             return 0;
@@ -166,17 +161,12 @@ export class AudioChannelInstance {
     constructor(callback, userData) {
         if (WEBAudio.audioContext) {
             this.gain = WEBAudio.audioContext.createGain();
-            this.gain?.connect(WEBAudio.audioContext.destination);
+            if (this.gain) {
+                this.gain.connect(WEBAudio.audioContext.destination);
+            }
         }
         this.callback = callback;
         this.userData = userData;
-    }
-    resetGain() {
-        if (WEBAudio.audioContext && this.gain) {
-            this.gain.disconnect();
-            this.gain = WEBAudio.audioContext.createGain();
-            this.gain?.connect(WEBAudio.audioContext.destination);
-        }
     }
     release() {
         this.disconnectSource();
@@ -286,8 +276,8 @@ export class AudioChannelInstance {
             });
             const fn = () => {
                 if (typeof this.source !== 'undefined' && this.source.mediaElement) {
-                    // @ts-ignore
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    
+                    
                     const { duration } = this.source.mediaElement;
                     setTimeout(() => {
                         if (soundClip && this.source && this.source.mediaElement) {
@@ -548,7 +538,7 @@ export class AudioChannelInstance {
                     }
                 }, 100);
             };
-            const innerPlay = (callback) => {
+            const innerPlay = () => {
                 if (this.source && this.source.mediaElement) {
                     if (isSupportBufferURL && this.source.readyToPlay) {
                         if (this.source.stopCache) {
@@ -561,7 +551,6 @@ export class AudioChannelInstance {
                                 innerFixPlay();
                             }
                             this.source.mediaElement.play();
-                            callback?.();
                         }
                     }
                     else {
@@ -572,8 +561,8 @@ export class AudioChannelInstance {
                             this.source.needCanPlay = false;
                             this.source.readyToPlay = true;
                             if (typeof this.source.mediaElement !== 'undefined') {
-                                // @ts-ignore
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                
+                                
                                 const { duration } = this.source.mediaElement;
                                 
                                 
@@ -593,7 +582,6 @@ export class AudioChannelInstance {
                                 }
                                 if (typeof this.source.mediaElement !== 'undefined') {
                                     this.source.mediaElement.play();
-                                    callback?.();
                                 }
                             }
                         };
@@ -606,7 +594,7 @@ export class AudioChannelInstance {
                     }
                 }
             };
-            // eslint-disable-next-line @typescript-eslint/naming-convention
+            
             const _reset = () => {
                 if (!this.source) {
                     return;
@@ -621,7 +609,7 @@ export class AudioChannelInstance {
                     this.source.stopTicker = undefined;
                 }
             };
-            // eslint-disable-next-line @typescript-eslint/naming-convention
+            
             const _pauseMediaElement = () => {
                 if (typeof this.source === 'undefined') {
                     return;
@@ -633,22 +621,28 @@ export class AudioChannelInstance {
                     this.source.mediaElement.pause();
                 }
             };
-            // eslint-disable-next-line @typescript-eslint/naming-convention
+            
             const _startPlayback = (offset) => {
                 if (typeof this.source === 'undefined' || !this.source.mediaElement) {
                     return;
                 }
                 if (this.source.playTimeout) {
-                    this.source.mediaElement.seek(offset);
+                    if (typeof this.source.mediaElement.seek === 'function') {
+                        this.source.mediaElement.seek(offset);
+                    }
+                    else {
+                        this.source.mediaElement.currentTime = offset;
+                    }
                     this.source.pauseRequested = false;
                     return;
                 }
-                innerPlay(() => {
-                    
-                    if (this.source && this.source.mediaElement) {
-                        this.source.mediaElement.seek(offset);
-                    }
-                });
+                innerPlay();
+                if (typeof this.source.mediaElement.seek === 'function') {
+                    this.source.mediaElement.seek(offset);
+                }
+                else {
+                    this.source.mediaElement.currentTime = offset;
+                }
             };
             const start = (startTime, offset) => {
                 if (typeof this.source === 'undefined') {
@@ -716,22 +710,22 @@ export class AudioChannelInstance {
                 start,
                 stop,
             };
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            
+            
             const { buffered, referrerPolicy, volume } = getAudio;
             const { source } = this;
             Object.defineProperty(this.source, 'loopStart', {
                 get() {
                     return 0;
                 },
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                
                 set(v) { },
             });
             Object.defineProperty(source, 'loopEnd', {
                 get() {
                     return 0;
                 },
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                
                 set(v) { },
             });
             Object.defineProperty(source, 'loop', {
@@ -851,7 +845,7 @@ export default {
         if (!soundClip) {
             return defaultSoundLength;
         }
-        const length = soundClip.getLength();
+        const length = soundClip.getLength() || defaultSoundLength;
         return length;
     },
     _JS_Sound_GetLoadState(bufferInstance) {
@@ -888,18 +882,13 @@ export default {
                     clearTimeout(webAutoResumeTicker);
                     webAutoResumeTicker = null;
                 }
-                WEBAudio.audioContext?.suspend();
+                
+                if (!GameGlobal.isIOSHighPerformanceMode) {
+                    WEBAudio.audioContext?.suspend();
+                }
             });
             wx.onShow(() => {
-                
-                if (isIOS175) {
-                    WEBAudio.audioContext?.close();
-                    WEBAudio.audioContext = wx.createWebAudioContext();
-                    Object.values(WEBAudio.audioInstances).forEach(it => it.resetGain());
-                }
-                else {
-                    WEBAudio.audioContext?.resume();
-                }
+                WEBAudio.audioContext?.resume();
             });
             if (webAudioNeedResume) {
                 
@@ -1044,12 +1033,12 @@ export default {
         WEBAudio.lOrientation.yUp = yUp;
         WEBAudio.lOrientation.zUp = zUp;
         if (WEBAudio.audioContext.listener.forwardX) {
-            WEBAudio.audioContext.listener.forwardX = -x;
-            WEBAudio.audioContext.listener.forwardY = -y;
-            WEBAudio.audioContext.listener.forwardZ = -z;
-            WEBAudio.audioContext.listener.upX = xUp;
-            WEBAudio.audioContext.listener.upY = yUp;
-            WEBAudio.audioContext.listener.upZ = zUp;
+            WEBAudio.audioContext.listener.forwardX.setValueAtTime(-x, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.forwardY.setValueAtTime(-y, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.forwardZ.setValueAtTime(-z, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.upX.setValueAtTime(xUp, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.upY.setValueAtTime(yUp, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.upZ.setValueAtTime(zUp, WEBAudio.audioContext.currentTime);
         }
         else {
             WEBAudio.audioContext.listener.setOrientation(-x, -y, -z, xUp, yUp, zUp);
@@ -1072,9 +1061,9 @@ export default {
         WEBAudio.lPosition.y = y;
         WEBAudio.lPosition.z = z;
         if (WEBAudio.audioContext.listener.positionX) {
-            WEBAudio.audioContext.listener.positionX = x;
-            WEBAudio.audioContext.listener.positionY = y;
-            WEBAudio.audioContext.listener.positionZ = z;
+            WEBAudio.audioContext.listener.positionX.setValueAtTime(x, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.positionY.setValueAtTime(y, WEBAudio.audioContext.currentTime);
+            WEBAudio.audioContext.listener.positionZ.setValueAtTime(z, WEBAudio.audioContext.currentTime);
         }
         else {
             WEBAudio.audioContext.listener.setPosition(x, y, z);
@@ -1131,7 +1120,7 @@ export default {
             printErrMsg(`Invalid audio pitch ${v} specified to WebAudio backend!`);
         }
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    
     _JS_Sound_SetPosition(channelInstance, x, y, z) {
         if (WEBAudio.audio3DSupport === 0 || WEBAudio.audioWebSupport === 0 || WEBAudio.audioWebEnabled === 0) {
             return;
@@ -1197,7 +1186,7 @@ export default {
         if (!audioInstance) {
             return WEBAudio.FAKEMOD_SAMPLERATE;
         }
-        // eslint-disable-next-line no-nested-ternary
+        
         const buffer = audioInstance.buffer
             ? audioInstance.buffer
             : audioInstance.source

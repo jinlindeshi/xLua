@@ -1474,7 +1474,7 @@ namespace CSObjectWrapEditor
                 new List<string>(){"UnityEngine.Light", "SetLightDirty"},
                 new List<string>(){"UnityEngine.Light", "shadowAngle"},
                 new List<string>(){"UnityEngine.Light", "shadowAngle"},
-                new List<string>(){"UnityEngine.MonoBehaviour", "EnableScriptReloadInCheckConsistency"}
+                new List<string>(){"UnityEngine.MonoBehaviour", "EnableScriptReloadInCheckConsistency", "System.Boolean"}
 
             };
 

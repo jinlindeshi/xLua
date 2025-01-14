@@ -76,7 +76,8 @@ const isWK = false;
                 _window.canvas.addEventListener = _window.addEventListener;
                 _window.canvas.removeEventListener = _window.removeEventListener;
             }
-            const { platform } = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
+            const _wx$getSystemInfoSync = wx.getSystemInfoSync();
+            const { platform } = _wx$getSystemInfoSync;
             // 开发者工具无法重定义 window
             if (platform === 'devtools') {
                 for (const key in _window) {
@@ -222,10 +223,13 @@ const isWK = false;
         function _interopRequireDefault(obj) {
             return obj && obj.__esModule ? obj : { default: obj };
         }
-        const { screenWidth, screenHeight, pixelRatio } = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+        const _wx$getSystemInfoSync = wx.getSystemInfoSync();
+        const { screenWidth } = _wx$getSystemInfoSync;
+        const { screenHeight } = _wx$getSystemInfoSync;
+        const { devicePixelRatio } = _wx$getSystemInfoSync;
         const innerWidth = exports.innerWidth = screenWidth;
         const innerHeight = exports.innerHeight = screenHeight;
-        exports.devicePixelRatio = pixelRatio;
+        exports.devicePixelRatio = devicePixelRatio;
         const screen = exports.screen = {
             availWidth: innerWidth,
             availHeight: innerHeight,
@@ -243,18 +247,9 @@ const isWK = false;
             value: true,
         });
         let performance = void 0;
-        let ori_performance = wx.getPerformance();
         const initTime = Date.now();
-        const ori_initTime = ori_performance.now();
         const clientPerfAdapter = Object.assign({}, {
             now: function now() {
-                if (GameGlobal.unityNamespace.isDevelopmentBuild
-                    && GameGlobal.unityNamespace.isProfilingBuild
-                    && !GameGlobal.unityNamespace.isDevtools
-                    && !GameGlobal.isIOSHighPerformanceMode) {
-                    // 由于wx.getPerformance()获取到的是微秒级，因此这里需要/1000.0，进行单位的统一
-                    return (ori_performance.now() - ori_initTime) * 0.001;
-                }
                 return (Date.now() - initTime);
             },
         });
@@ -1221,7 +1216,8 @@ const isWK = false;
         });
         const _util = __webpack_require__(9);
         // TODO 需要 wx.getSystemInfo 获取更详细信息
-        const { platform } = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
+        const _wx$getSystemInfoSync = wx.getSystemInfoSync();
+        const { platform } = _wx$getSystemInfoSync;
         const navigator = {
             platform,
             language: 'zh-cn',

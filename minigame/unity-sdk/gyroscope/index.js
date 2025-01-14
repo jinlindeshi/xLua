@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { formatJsonStr, formatResponse, convertDataToPointer } from '../utils';
 let wxStartGyroscopeCallback;
 let wxStopGyroscopeCallback;

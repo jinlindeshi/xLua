@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import response from './response';
 import moduleHelper from './module-helper';
 import { cacheArrayBuffer, formatJsonStr, formatResponse } from './utils';
@@ -82,7 +81,7 @@ export default {
     WXWriteFileSync(filePath, data, encoding) {
         try {
             const fs = wx.getFileSystemManager();
-            // @ts-ignore
+            
             fs.writeFileSync(filePath, data, encoding);
             fileInfoHandler.addFileInfo(filePath, data);
         }
@@ -284,9 +283,9 @@ export default {
             ...config,
             success(res) {
                 if (!Array.isArray(res.stats)) {
-                    // @ts-ignore C#中特殊处理
+                    
                     res.one_stat = res.stats;
-                    // @ts-ignore C#中特殊处理
+                    
                     res.stats = null;
                 }
                 moduleHelper.send('StatCallback', JSON.stringify({
@@ -303,11 +302,11 @@ export default {
                 }));
             },
             complete(res) {
-                // @ts-ignore C#中特殊处理
+                
                 if (!Array.isArray(res.stats)) {
-                    // @ts-ignore C#中特殊处理
+                    
                     res.one_stat = res.stats;
-                    // @ts-ignore C#中特殊处理
+                    
                     res.stats = null;
                 }
                 moduleHelper.send('StatCallback', JSON.stringify({
@@ -408,9 +407,7 @@ export default {
     },
     WX_FileSystemManagerReadSync(option, callbackId) {
         const fs = wx.getFileSystemManager();
-        const optionConfig = formatJsonStr(option);
-        optionConfig.arrayBuffer = new ArrayBuffer(optionConfig.arrayBuffer.length);
-        const res = fs.readSync(optionConfig);
+        const res = fs.readSync(formatJsonStr(option));
         cacheArrayBuffer(callbackId, res.arrayBuffer);
         return JSON.stringify({
             bytesRead: res.bytesRead,
@@ -440,12 +437,16 @@ export default {
         const optionConfig = formatJsonStr(option);
         optionConfig.data = data.buffer;
         const res = fs.writeSync(optionConfig);
-        return JSON.stringify(res);
+        return JSON.stringify({
+            mode: res.bytesWritten,
+        });
     },
     WX_FileSystemManagerWriteStringSync(option) {
         const fs = wx.getFileSystemManager();
         const res = fs.writeSync(formatJsonStr(option));
-        return JSON.stringify(res);
+        return JSON.stringify({
+            mode: res.bytesWritten,
+        });
     },
     WX_FileSystemManagerOpenSync(option) {
         const fs = wx.getFileSystemManager();
